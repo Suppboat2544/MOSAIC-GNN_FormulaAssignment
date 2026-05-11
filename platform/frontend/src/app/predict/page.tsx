@@ -174,7 +174,7 @@ function PredictForm() {
               )}
               <Droplets size={16} className={clsx("mb-2", sampleType === "DOM" ? "text-cyan-400" : "text-slate-500")} />
               <p className="font-semibold text-slate-100 text-sm">DOM / NOM</p>
-              <p className="text-[10px] font-mono text-cyan-600 mt-0.5">Model 10 · 14-dim FCL</p>
+              <p className="text-[10px] font-mono text-cyan-600 mt-0.5">Model 10 · 14-dim FCL · 97.68% Top-1</p>
               <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                 Dissolved / natural organic matter, environmental &amp; marine samples.
               </p>

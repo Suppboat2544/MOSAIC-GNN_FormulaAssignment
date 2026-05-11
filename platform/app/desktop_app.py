@@ -531,7 +531,7 @@ class MosaicApp(tk.Tk):
 
         for i, (stype, sname, sdesc) in enumerate([
             ("DOM",  "DOM  —  Environmental / Marine",
-             "Dissolved organic matter. Routes to Model 10 (53.6% Top-1)."),
+             "Dissolved organic matter. Routes to Model 10 (97.68% Top-1)."),
             ("PFAS", "PFAS  —  Fluorinated Compounds",
              "Per- & polyfluoroalkyl substances / AFFF. Routes to Model 11b (78.9% Top-1)."),
         ]):

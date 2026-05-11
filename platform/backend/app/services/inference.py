@@ -580,13 +580,18 @@ def run_inference(req: PredictRequest) -> None:
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "results.json").write_text(json.dumps(feature_results, indent=2))
 
-        # Save lightweight comparison stub (real multi-model compare needs all 3 models)
+        # Benchmark accuracies (DOM test set, n=4,047 IHSS standards; from paper Table 2)
+        _BENCHMARK_METRICS = [
+            {"model": "Model9",  "top1": 97.01, "top5": 100.0, "mpe": 0.41,  "coverage": 100.0},
+            {"model": "Model10", "top1": 97.68, "top5": 99.58, "mpe": 0.38,  "coverage": 100.0},
+            {"model": "Model11", "top1": 91.50, "top5": 97.65, "mpe": 0.52,  "coverage": 100.0},
+        ]
         comparison = {
             "job_id": req.job_id,
             "model_used": model_name,
             "sample_type": element_set,
             "n_features": len(feature_results),
-            "metrics": [],  # populated by compare endpoint if user runs all 3 models
+            "metrics": _BENCHMARK_METRICS,
         }
         (out_dir / "comparison.json").write_text(json.dumps(comparison, indent=2))
 

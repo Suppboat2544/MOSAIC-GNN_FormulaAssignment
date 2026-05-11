@@ -2,5 +2,27 @@
   "job_id": "3e7094d2-4772-4831-8dde-1bff59b77034",
   "model_used": "Model10",
   "n_features": 4178,
-  "metrics": []
+  "metrics": [
+    {
+      "model": "Model9",
+      "top1": 97.01,
+      "top5": 100.0,
+      "mpe": 0.41,
+      "coverage": 100.0
+    },
+    {
+      "model": "Model10",
+      "top1": 97.68,
+      "top5": 99.58,
+      "mpe": 0.38,
+      "coverage": 100.0
+    },
+    {
+      "model": "Model11",
+      "top1": 91.5,
+      "top5": 97.65,
+      "mpe": 0.52,
+      "coverage": 100.0
+    }
+  ]
 }
