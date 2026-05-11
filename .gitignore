@@ -1,0 +1,46 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Datasets (not redistributed — see README for data availability)
+dataset/
+
+# Large output directories (training logs, intermediate checkpoints)
+outputs/
+output_Model9/
+output_Model10/
+output_Model11/
+output_ModelComparison/
+pfas_comparison/
+
+# Model checkpoints kept: platform/backend/checkpoints/ (inference weights)
+
+# Node.js / Next.js
+platform/frontend/node_modules/
+platform/frontend/.next/
+platform/frontend/.env.local
+
+# LaTeX build artefacts
+doc/*.aux
+doc/*.log
+doc/*.bbl
+doc/*.blg
+doc/*.toc
+doc/*.out
+doc/*.fls
+doc/*.fdb_latexmk
+doc/*.synctex.gz
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editor
+.vscode/settings.json

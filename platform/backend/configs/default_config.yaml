@@ -1,0 +1,148 @@
+# MOSAIC-GNN Configuration
+# ========================
+
+# Global reproducibility
+seed: 42
+
+# Data pipeline
+data:
+  ppm_error: 3.0
+  sn_threshold: 5.0
+  blank_sigma_multiplier: 3
+  max_candidates_per_feature: 500
+  
+  # Elemental Transformation Dictionary (ETD)
+  etd:
+    CH2: 14.01565
+    O: 15.99491
+    CO2: 43.98983
+    H2O: 18.01056
+    CF2: 49.99694
+    HF: 20.00623
+    SO3: 79.95682
+    NH3: 17.02655
+    CH2O: 30.01057
+  
+  # PFAS-specific ETD extensions
+  pfas_etd:
+    COF2: 65.99185
+    SO2F2: 81.96903
+  
+  # Natural isotope abundances
+  isotope_abundances:
+    13C: 0.01103
+    34S: 0.04250
+    37Cl: 0.24229
+    81Br: 0.49314
+  
+  # Isotope mass shifts
+  isotope_shifts:
+    13C_M1: 1.003355
+    13C_M2: 2.004969
+    34S_M2: 1.995797
+    37Cl_M2: 1.997050
+    81Br_M2: 1.997924
+  
+  # Adduct offsets
+  adduct_offsets:
+    "[M+H]+": 1.00728
+    "[M+Na]+": 22.98922
+    "[M+K]+": 38.96316
+    "[M+NH4]+": 18.03437
+    "[M-H]-": -1.00728
+    "[M+Cl]-": -34.96941
+  
+  # Seven Golden Rules bounds
+  golden_rules:
+    max_elements:
+      C: 100
+      H: 200
+      O: 50
+      N: 10
+      S: 5
+      P: 5
+      F: 30
+      Cl: 10
+      Br: 5
+    constraints:
+      min_dbe: 0
+      max_hc_ratio: 3.0
+      max_oc_ratio: 3.0
+      max_nc_ratio: 2.0
+      max_sc_ratio: 1.0
+
+# Model hyperparameters
+model:
+  # SMDG R-GCN Encoder (Module 1)
+  smdg_rgcn:
+    hidden_dim: 256
+    num_layers: 4
+    num_bases: 4
+    dropout: 0.1
+    activation: "ReLU"
+    norm: "LayerNorm"
+  
+  # Isotope GAT Encoder (Module 2)
+  iso_gat:
+    hidden_dim: 128
+    num_layers: 3
+    num_heads: 8
+    dropout: 0.1
+    output_dim: 9  # C,H,O,N,S,P,F,Cl,Br
+  
+  # Formula GIN Scorer (Module 3)
+  fcl_gin:
+    input_dim: 275  # 10 + 256 + 9
+    hidden_dim: 256
+    num_layers: 3
+    eps_init: 0.0
+    readout_mlp: [256, 128, 1]
+  
+  # Adduct Consistency Layer (Module 4)
+  adc:
+    lambda_init: 0.1
+  
+  # Hierarchical Head (Module 5)
+  hierarchical:
+    num_elemental_classes: 7  # CHO/CHON/CHOS/CHONS/CHOF/CHONSP/other
+    num_dbe_bins: 4  # 0-3, 4-7, 8-12, 13+
+  
+  # FiLM conditioning (Phase 3)
+  film:
+    matrix_embed_dim: 64
+    num_matrix_types: 5  # river_DOM, seawater, blood_plasma, soil, PFAS_water
+  
+  # Evidential UQ (Phase 3)
+  evidential:
+    lambda_evidence: 0.05
+    min_alpha: 1.01
+
+# Training hyperparameters
+training:
+  optimizer: "AdamW"
+  lr: 1.0e-3
+  weight_decay: 1.0e-5
+  batch_size: 32
+  max_epochs: 100
+  patience: 15
+  scheduler:
+    type: "CosineAnnealingWarmRestarts"
+    T_0: 10
+    T_mult: 2
+
+# Loss weights
+loss:
+  lambda_adc: 0.1
+  lambda_adc_final: 0.5
+  lambda_adc_anneal_epoch: 20
+  lambda_iso: 0.2
+  lambda_uq: 0.05
+  num_hard_negatives: 10
+  num_random_negatives: 10
+
+# Semi-supervised pretraining
+pretraining:
+  mask_ratio: 0.30
+  smoothness_mu: 0.01
+  pretrain_epochs: 50
+  freeze_epochs: 10

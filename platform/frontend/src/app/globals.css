@@ -1,0 +1,229 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ── */
+body {
+  background-color: #020817;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: #334155; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ── Dot-grid background ── */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(148,163,184,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── Glow ── */
+.glow-violet {
+  box-shadow: 0 0 28px -4px rgba(139,92,246,0.55),
+              0 0 12px -2px rgba(139,92,246,0.3);
+}
+
+/* ── Cards (was "glass") ── */
+.glass {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 1rem;
+}
+.glass-sm {
+  background: #172032;
+  border: 1px solid #2d3e55;
+  border-radius: 0.75rem;
+}
+
+/* ── Gradient text ── */
+.grad-text {
+  background-image: linear-gradient(to right, #a78bfa, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.grad-text-cyan {
+  background-image: linear-gradient(to right, #22d3ee, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Form input ── */
+.inp {
+  display: block;
+  width: 100%;
+  border-radius: 0.75rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  padding: 0.675rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #f1f5f9;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.inp::placeholder { color: #64748b; }
+.inp:focus        { border-color: #7c3aed; background: #243050; }
+
+/* ── Primary button ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #ffffff;
+  background: linear-gradient(to right, #7c3aed, #9333ea);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+.btn-primary:hover    { opacity: 0.87; }
+.btn-primary:active   { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Secondary button ── */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  background: #1e293b;
+  border: 1px solid #334155;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+.btn-secondary:hover { background: #334155; }
+
+/* ── Stat pill ── */
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* ── Step badge (numbered circle) ── */
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  flex-shrink: 0;
+}
+
+/* ── Metric card with coloured left accent ── */
+.metric-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 0.875rem;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+}
+.metric-card:hover          { border-color: #334155; }
+.metric-card-violet         { border-left: 3px solid #7c3aed; }
+.metric-card-cyan           { border-left: 3px solid #22d3ee; }
+.metric-card-emerald        { border-left: 3px solid #34d399; }
+.metric-card-amber          { border-left: 3px solid #fbbf24; }
+
+/* ── Alert blocks ── */
+.alert {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
+  font-size: 0.875rem;
+}
+.alert-error   { background: rgba(127,29,29,0.4);  border-color: #991b1b; color: #fca5a5; }
+.alert-success { background: rgba(6,78,59,0.4);    border-color: #065f46; color: #6ee7b7; }
+.alert-info    { background: rgba(30,58,138,0.35); border-color: #1e40af; color: #93c5fd; }
+
+/* ── "How it works" workflow step card ── */
+.flow-step {
+  flex: 1;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.flow-step:hover { border-color: #334155; }
+
+/* ── Small tags / pills ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.tag-violet  { background: rgba(124,58,237,0.2);  color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+.tag-cyan    { background: rgba(6,182,212,0.15);  color: #67e8f9; border: 1px solid rgba(6,182,212,0.3); }
+.tag-emerald { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+.tag-amber   { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+.tag-slate   { background: rgba(51,65,85,0.5);    color: #94a3b8; border: 1px solid #334155; }
+
+/* ── Slide-up entrance animation ── */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slide-up 0.35s ease-out both; }
+
+/* ── Form card container ── */
+.form-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+/* ── Section header with trailing line ── */
+.section-line {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.section-line::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #1e293b;
+}
+
+/* ── Divider ── */
+.divider { height: 1px; background: #1e293b; }
+
