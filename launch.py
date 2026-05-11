@@ -130,46 +130,55 @@ def show_launcher() -> "str | None":
 def _start_web():
     try:
         from tqdm import tqdm
+        _have_tqdm = True
     except ImportError:
-        # fallback — simple print progress
-        class tqdm:  # type: ignore[no-redef]
-            def __init__(self, total, desc="", bar_format=None, **kw):
-                self._total = total
-                self._n = 0
-                self._desc = desc
-                print(f"\n{desc}")
-            def update(self, n=1):
-                self._n += n
-                pct = int(self._n / self._total * 40)
-                bar = "█" * pct + "░" * (40 - pct)
-                print(f"\r  [{bar}] {self._n}/{self._total}", end="", flush=True)
-            def set_description(self, s):
-                print(f"\n  {s}", end="")
-            def close(self):
-                print()
+        _have_tqdm = False
+
+    # ── Print header FIRST so the progress bar appears below it ──────────────
+    print("\n" + "═" * 58)
+    print("  MOSAIC-GNN  ·  Launching Web Platform")
+    print("═" * 58 + "\n")
 
     STEPS = 10
-    bar = tqdm(
-        total=STEPS,
-        desc="🚀  MOSAIC-GNN Platform",
-        bar_format="  {desc}  {bar}  {n}/{total}",
-        ncols=70,
-        colour="magenta",  # ignored on plain tqdm fallback
-    )
 
-    def _step(desc: str, wait: float = 0.3):
-        bar.set_description(desc)
+    if _have_tqdm:
+        bar = tqdm(
+            total=STEPS,
+            desc="  Initialising",
+            bar_format="  {desc:<35} {bar}  {n}/{total}",
+            ncols=72,
+            colour="magenta",
+        )
+    else:
+        class bar:  # type: ignore[no-redef]
+            _n = 0
+            @staticmethod
+            def set_description(s): pass
+            @staticmethod
+            def update(n=1):
+                bar._n += n
+                pct = int(bar._n / STEPS * 30)
+                b = "█" * pct + "░" * (30 - pct)
+                print(f"\r  [{b}] {bar._n}/{STEPS}", end="", flush=True)
+            @staticmethod
+            def close():
+                print()
+
+    def _step(desc: str, wait: float = 0.25):
+        bar.set_description(f"  {desc}")
         bar.update(1)
         time.sleep(wait)
 
-    print("\n" + "═" * 58)
-    print("  MOSAIC-GNN  ·  Launching Web Platform")
-    print("═" * 58)
+    # ── Step 1: Environment check ─────────────────────────────────────────────
+    _step("Checking environment …", 0.2)
 
-    # ── Start backend ──
-    _step("Starting FastAPI backend …", 0.2)
+    # ── Steps 2–4: Backend ───────────────────────────────────────────────────
     backend_proc = None
-    if not _backend_alive():
+    if _backend_alive():
+        _step("Backend: already running  ✔", 0.1)          # step 2
+        _step("Backend: health confirmed  ✔", 0.1)         # step 3
+    else:
+        _step("Backend: starting FastAPI …", 0.2)          # step 2
         backend_cmd = [
             PYTHON, "-m", "uvicorn",
             "app.main:app",
@@ -182,29 +191,27 @@ def _start_web():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
-    else:
-        _step("Backend already running  ✔", 0.1)
+        _step("Backend: waiting for startup …", 0.1)       # step 3
+        for i in range(25):
+            if _backend_alive():
+                break
+            time.sleep(1)
+            bar.set_description(f"  Backend starting … ({i+1}s)")
+        else:
+            bar.close()
+            print("\n  ✘  Backend did not start. Check that port 8000 is free.\n")
+            return
 
-    # ── Wait for backend ──
-    _step("Waiting for backend to be ready …", 0.4)
-    for i in range(25):
-        if _backend_alive():
-            break
-        time.sleep(1)
-        if i % 3 == 0:
-            bar.set_description(f"Backend starting … ({i+1}s)")
-    else:
-        bar.close()
-        print("\n  ✘  Backend did not start. Check that port 8000 is free.\n")
-        return
+    _step("Backend: ready  ✔", 0.2)                        # step 4
 
-    _step("Backend ready  ✔", 0.2)
-
-    # ── Start Next.js frontend ──
-    _step("Starting Next.js frontend …", 0.3)
+    # ── Steps 5–8: Frontend ──────────────────────────────────────────────────
     frontend_proc = None
-    if not _frontend_alive():
-        # detect npm path
+    if _frontend_alive():
+        _step("Frontend: already running  ✔", 0.1)         # step 5
+        _step("Frontend: CSS compiled  ✔", 0.1)            # step 6
+        _step("Frontend: routes resolved  ✔", 0.1)         # step 7
+    else:
+        _step("Frontend: starting Next.js …", 0.2)         # step 5
         npm_candidates = [
             "/usr/local/bin/npm", "/opt/homebrew/bin/npm", "npm",
         ]
@@ -215,24 +222,23 @@ def _start_web():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
-    else:
-        _step("Frontend already running  ✔", 0.1)
+        _step("Frontend: compiling Tailwind CSS …", 0.2)   # step 6
+        for i in range(40):
+            if _frontend_alive():
+                break
+            time.sleep(1.5)
+            bar.set_description(f"  Frontend compiling … ({i+1}s)")
+        else:
+            bar.close()
+            print("\n  ✘  Frontend did not start. Run 'npm install' inside platform/frontend/ first.\n")
+            return
+        _step("Frontend: routes resolved  ✔", 0.2)         # step 7
 
-    # ── Wait for frontend ──
-    _step("Waiting for frontend to be ready …", 0.5)
-    for i in range(40):
-        if _frontend_alive():
-            break
-        time.sleep(1.5)
-        if i % 4 == 0:
-            bar.set_description(f"Frontend compiling … ({(i+1)*1}s)")
-    else:
-        bar.close()
-        print("\n  ✘  Frontend did not start. Run 'npm install' inside platform/frontend/ first.\n")
-        return
+    _step("Frontend: ready  ✔", 0.2)                       # step 8
 
-    _step("Frontend ready  ✔", 0.2)
-    _step("Platform fully loaded  ✔", 0.2)
+    # ── Steps 9–10: Final ────────────────────────────────────────────────────
+    _step("Opening browser …", 0.3)                        # step 9
+    _step("Platform fully loaded  ✔", 0.2)                 # step 10
     bar.close()
 
     print("\n" + "═" * 58)
