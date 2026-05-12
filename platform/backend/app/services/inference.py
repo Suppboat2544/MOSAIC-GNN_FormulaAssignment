@@ -94,6 +94,22 @@ def _ratios(counts: dict[str, int]) -> dict[str, float]:
     }
 
 
+def _classify_from_formula(counts: dict[str, int]) -> str:
+    """Derive element class from actual formula atom counts (not model prediction)."""
+    has_O = counts.get("O", 0) > 0
+    has_N = counts.get("N", 0) > 0
+    has_S = counts.get("S", 0) > 0
+    has_P = counts.get("P", 0) > 0
+    has_F = counts.get("F", 0) > 0
+    if has_P:                    return "CHONSP"
+    if has_F:                    return "CHOF"
+    if has_N and has_S and has_O: return "CHONS"
+    if has_N and has_O:           return "CHON"
+    if has_S and has_O:           return "CHOS"
+    if has_O:                     return "CHO"
+    return "other"
+
+
 def _vector_to_formula(vec: Any) -> str:
     parts = []
     for elem, count in zip(ELEMENTS, vec):
@@ -439,24 +455,27 @@ def _infer_sample(model: Any, sample: Any, device: torch.device) -> list[dict]:
         e_feat = energies[mask]
         order = e_feat.argsort()
 
-        # Top-1 global candidate index
+        # Top-5 candidates — gather formula strings and ppm errors for all ranks
         global_indices = mask.nonzero(as_tuple=False).squeeze(1)
-        best_global = global_indices[order[0]].item()
-
-        # Formula
-        formula = ""
-        if formula_labels and best_global < len(formula_labels):
-            formula = formula_labels[best_global]
-        elif formula_vectors is not None and best_global < formula_vectors.shape[0]:
-            formula = _vector_to_formula(formula_vectors[best_global])
-
-        # Mass error — compute before confidence so accuracy can inform it
         obs_mz = feature_mz[feat_idx].item() if feature_mz is not None else None
-        pred_mass = candidate_masses[best_global].item() if candidate_masses is not None else None
-        mass_error_ppm: float | None = None
-        if pred_mass is not None and obs_mz is not None and obs_mz > 0:
-            pred_mz = pred_mass - PROTON_MASS   # [M-H]⁻ adduct
-            mass_error_ppm = (pred_mz - obs_mz) / obs_mz * 1e6
+
+        top_candidates: list[tuple[str, float | None]] = []
+        for rank_i in range(min(5, len(order))):
+            gi = global_indices[order[rank_i]].item()
+            frm = ""
+            if formula_labels and gi < len(formula_labels):
+                frm = formula_labels[gi]
+            elif formula_vectors is not None and gi < formula_vectors.shape[0]:
+                frm = _vector_to_formula(formula_vectors[gi])
+            pred_m = candidate_masses[gi].item() if candidate_masses is not None else None
+            ppm: float | None = None
+            if pred_m is not None and obs_mz is not None and obs_mz > 0:
+                ppm = (pred_m - PROTON_MASS - obs_mz) / obs_mz * 1e6
+            top_candidates.append((frm, ppm))
+
+        # Top-1 result (used for confidence + element class)
+        best_global = global_indices[order[0]].item()
+        formula, mass_error_ppm = top_candidates[0]
 
         # Confidence: energy-gap score penalised by mass accuracy.
         # Energy gap: large positive gap → the best candidate is clearly
@@ -477,13 +496,21 @@ def _infer_sample(model: Any, sample: Any, device: torch.device) -> list[dict]:
         else:
             confidence = conf_energy
 
-        # Element class
-        ec_idx = eclass_labels[best_global].item() if eclass_labels is not None else 6
-        ec_name = ECLASS_NAMES[ec_idx] if ec_idx < len(ECLASS_NAMES) else "other"
+        # Element class — derived from the assigned formula's atom counts,
+        # not from the model's eclass prediction head (which may disagree with
+        # the actual formula for edge-case molecules, e.g. CHNS with no oxygen
+        # being labelled CHONS).
+        counts = _parse_formula(formula)
+        ec_name = _classify_from_formula(counts)
 
         # H/C, O/C, N/C, S/C
-        counts = _parse_formula(formula)
         ratios = _ratios(counts)
+
+        # Top-k extra columns for CSV export (ranks 2–5)
+        top_k_fields: dict = {}
+        for k_i, (frm, ppm) in enumerate(top_candidates[1:], 2):
+            top_k_fields[f"top{k_i}_formula"] = frm
+            top_k_fields[f"top{k_i}_ppm"] = round(ppm, 4) if ppm is not None else None
 
         results.append({
             "mz": round(obs_mz, 6) if obs_mz is not None else None,
@@ -492,6 +519,7 @@ def _infer_sample(model: Any, sample: Any, device: torch.device) -> list[dict]:
             "mass_error_ppm": round(mass_error_ppm, 4) if mass_error_ppm is not None else None,
             "confidence": round(confidence, 4),
             **{k: round(v, 4) for k, v in ratios.items()},
+            **top_k_fields,
         })
 
     return results

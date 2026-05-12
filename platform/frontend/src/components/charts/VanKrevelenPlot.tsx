@@ -15,7 +15,7 @@ interface Props { points: Point[] }
 
 const CLASS_COLORS: Record<string, string> = {
   CHO: "#7c3aed", CHON: "#0ea5e9", CHOS: "#10b981",
-  CHONS: "#f59e0b", CHOP: "#ef4444", Other: "#94a3b8",
+  CHONS: "#f59e0b", CHOP: "#ef4444", CHONSP: "#ec4899", other: "#94a3b8",
 };
 
 export function VanKrevelenPlot({ points }: Props) {
@@ -58,7 +58,7 @@ export function VanKrevelenPlot({ points }: Props) {
       .attr("cx", p => xScale(p.O_C))
       .attr("cy", p => yScale(p.H_C))
       .attr("r", 3)
-      .attr("fill", p => CLASS_COLORS[p.element_class] ?? CLASS_COLORS.Other)
+      .attr("fill", p => CLASS_COLORS[p.element_class] ?? CLASS_COLORS.other)
       .attr("fill-opacity", 0.7)
       .on("mouseover", (event, d) => {
         const rect = el.getBoundingClientRect();

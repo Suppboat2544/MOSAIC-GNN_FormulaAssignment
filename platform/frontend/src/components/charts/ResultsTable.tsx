@@ -5,8 +5,16 @@ interface Row {
   mz: number;
   formula: string;
   element_class: string;
-  mass_error_ppm: number;
+  mass_error_ppm: number | null;
   confidence: number;
+  top2_formula?: string;
+  top2_ppm?: number | null;
+  top3_formula?: string;
+  top3_ppm?: number | null;
+  top4_formula?: string;
+  top4_ppm?: number | null;
+  top5_formula?: string;
+  top5_ppm?: number | null;
 }
 
 interface Props { rows: Row[] }
@@ -48,7 +56,7 @@ export function ResultsTable({ rows }: Props) {
                 <td className="py-1.5 pr-4 font-mono">{r.mz.toFixed(5)}</td>
                 <td className="py-1.5 pr-4 font-mono text-violet-300">{r.formula}</td>
                 <td className="py-1.5 pr-4">{r.element_class}</td>
-                <td className="py-1.5 pr-4">{r.mass_error_ppm.toFixed(3)}</td>
+                <td className="py-1.5 pr-4">{r.mass_error_ppm != null ? r.mass_error_ppm.toFixed(3) : "—"}</td>
                 <td className="py-1.5">
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-20 bg-slate-700 rounded-full overflow-hidden">
