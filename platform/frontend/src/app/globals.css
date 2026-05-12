@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 /* ── Base ── */
+html {
+  /* Scale the entire UI — all rem-based Tailwind sizes grow with this value.
+     Default is 16 px (100%). 120% = 19.2 px, making the platform feel
+     appropriately large on a typical desktop display. */
+  font-size: 120%;
+}
+
 body {
   background-color: #020817;
   -webkit-font-smoothing: antialiased;

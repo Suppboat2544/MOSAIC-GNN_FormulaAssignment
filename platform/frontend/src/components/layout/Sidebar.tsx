@@ -104,7 +104,7 @@ export function Sidebar() {
   const currentIdx = WORKFLOW_HREFS.indexOf(path as typeof WORKFLOW_HREFS[number]);
 
   return (
-    <aside className="w-52 flex-shrink-0 flex flex-col bg-[#0c1526] border-r border-slate-800/80">
+    <aside className="w-60 flex-shrink-0 flex flex-col bg-[#0c1526] border-r border-slate-800/80">
       {/* Logo area */}
       <div className="flex items-center gap-3 px-4 h-14 border-b border-slate-800/80 flex-shrink-0">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700
