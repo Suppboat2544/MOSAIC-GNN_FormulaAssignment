@@ -57,6 +57,13 @@ docker-compose up
 - Interactive per-class histogram and paginated formula tables
 - REST API at `http://localhost:8000/docs`
 
+> **Browser note:** The web platform is optimised for **Safari** on macOS.
+> Opening `http://localhost:3000` in Safari gives the best visual experience
+> (correct scaling, font sizes, and layout). Google Chrome may display the
+> interface slightly smaller due to differences in how each browser resolves
+> the base font size. If Chrome feels cramped, use Safari or zoom in with
+> `Cmd +` / browser zoom controls.
+
 ### Desktop Application (Tkinter, no internet required)
 ```bash
 pip install -r platform/backend/requirements.txt
