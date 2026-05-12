@@ -4,10 +4,10 @@
 
 /* ── Base ── */
 html {
-  /* Scale the entire UI — all rem-based Tailwind sizes grow with this value.
-     Default is 16 px (100%). 120% = 19.2 px, making the platform feel
-     appropriately large on a typical desktop display. */
-  font-size: 120%;
+  /* Absolute px base so Chrome and Safari scale identically.
+     18 px ≈ 112 % of the 16 px browser default — gives a noticeably
+     larger UI without breaking layout. Increase toward 20 px if needed. */
+  font-size: 18px;
 }
 
 body {
